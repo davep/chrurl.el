@@ -5,7 +5,7 @@
 ;; Version: 0.01
 ;; Keywords: hypermedia
 ;; URL: https://github.com/davep/chrurl.el
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "25.1"))
 
 ;; This program is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the
@@ -33,18 +33,20 @@
 
 (require 'subr-x)
 
-(defvar chrurl-macos
-  "
-tell application \"Google Chrome\"
-  get URL of active tab of first window
-end tell"
+(defvar chrurl-macos "
+if application \"Google Chrome\" is running then
+  tell app \"Google Chrome\" to get URL of active tab of first window
+end if
+"
   "AppleScript code to get the URL from Chrome.")
 
 ;;;###autoload
 (defun chrurl ()
   "Insert the URL of the 'topmost' instance of Chrome."
   (interactive)
-  (insert (string-trim (shell-command-to-string (format "osascript -e '%s'" chrurl-macos)))))
+  (if-let ((url (string-trim (shell-command-to-string (format "osascript -e '%s'" chrurl-macos)))))
+      (insert url)
+    (error "Could not get the URL from Google Chrome")))
 
 (provide 'chrurl)
 
