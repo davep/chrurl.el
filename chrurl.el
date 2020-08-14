@@ -41,11 +41,15 @@ end if
   "AppleScript code to get the URL from Chrome.")
 
 ;;;###autoload
-(defun chrurl ()
-  "Insert the URL of the 'topmost' instance of Chrome."
-  (interactive)
+(defun chrurl (&optional markup)
+  "Insert the URL of the 'topmost' instance of Chrome.
+
+MARKUP is a prefix argument. nil means insert the URL as-is. any
+other value means the URL should be inserted wrapped in <URL:...>
+markup."
+  (interactive "*P")
   (if-let ((url (string-trim (shell-command-to-string (format "osascript -e '%s'" chrurl-macos)))))
-      (insert url)
+      (insert (if markup (format "<URL:%s>" url ) url))
     (error "Could not get the URL from Google Chrome")))
 
 (provide 'chrurl)
